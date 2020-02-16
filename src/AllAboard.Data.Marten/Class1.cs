@@ -1,0 +1,51 @@
+﻿namespace AllAboard.Data.Marten
+{
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using global::Marten;
+    using Integrations.Data;
+    using Services;
+
+    public class Session : ISession
+    {
+        private readonly IDocumentSession _session;
+
+        public Session(IDocumentSession session)
+        {
+            _session = session;
+        }
+
+        public void Add<T>(T entity) where T : Entity
+        {
+            _session.Insert(entity);
+        }
+
+        public void Remove(MessageEntry publishedMessaged)
+        {
+            _session.Delete(publishedMessaged);
+        }
+
+        public async Task<bool> HasProcessedMessage(string messageId)
+        {
+            bool processed = await _session
+                .Query<ProcessedMessage>()
+                .AnyAsync(x => x.Id == messageId);
+            return processed;
+        }
+
+        public Task<IEnumerable<MessageEntry>> GetPublishedMessages()
+        {
+            IEnumerable<MessageEntry> items = _session
+                .Query<MessageEntry>()
+                .OrderByDescending(x => x.ProcessedAt)
+                .ToList();
+            return Task.FromResult(items);
+        }
+
+        public Task Commit()
+        {
+            return _session.SaveChangesAsync();
+        }
+    }
+}
