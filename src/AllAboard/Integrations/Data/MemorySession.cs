@@ -37,6 +37,12 @@
             return Task.FromResult((IEnumerable<MessageEntry>)items.ToArray());
         }
 
+        public async Task<MessageEntry> GetPublishedMessage(string id)
+        {
+            var messages = await GetPublishedMessages();
+            return messages.SingleOrDefault(x => x.Id == id);
+        }
+
         public Task Commit()
         {
             foreach (var entity in _transactionStore)
