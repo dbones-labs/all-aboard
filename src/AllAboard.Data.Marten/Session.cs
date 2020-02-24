@@ -3,19 +3,9 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Configuration;
     using global::Marten;
     using Integrations.Data;
-    using Microsoft.Extensions.DependencyInjection;
     using Services;
-
-    public class Marten : IDataStoreProvider {
-        public void RegisterServices(IServiceCollection services)
-        {
-            services.AddScoped<ISession, ISession>();
-        }
-    }
-
 
     public class Session : ISession
     {

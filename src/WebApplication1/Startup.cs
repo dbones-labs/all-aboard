@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -7,8 +6,6 @@ using Microsoft.Extensions.Hosting;
 
 namespace WebApplication1
 {
-    using MassTransit;
-
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -27,6 +24,10 @@ namespace WebApplication1
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseMiddleware<AllAboardMiddleware>();
+            app.UseMiddleware<MartenMiddleware>();
+            
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -42,21 +43,7 @@ namespace WebApplication1
             {
                 endpoints.MapControllers();
             });
+
         }
-    }
-
-
-    public class HelloConsumer : IConsumer<Hello>
-    {
-        public Task Consume(ConsumeContext<Hello> context)
-        {
-            return Task.CompletedTask;
-        }
-    }
-
-
-    public class Hello
-    {
-        public string Name { get; set; }
     }
 }

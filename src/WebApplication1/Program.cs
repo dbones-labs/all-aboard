@@ -1,22 +1,13 @@
 namespace WebApplication1
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using System.Threading;
-    using System.Threading.Tasks;
     using AllAboard.Bus.MassTransit;
     using AllAboard.Configuration;
     using AllAboard.Data.Marten;
-    using AllAboard.Services;
     using Marten;
-    using Marten.Schema.Identity;
-    using Marten.Storage;
     using MassTransit;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
@@ -114,81 +105,5 @@ namespace WebApplication1
                 {
                     webBuilder.UseStartup<Startup>();
                 });
-    }
-
-
-    public class StringIdGeneration : IIdGeneration
-    {
-
-        public IEnumerable<System.Type> KeyTypes { get; } = new System.Type[] { typeof(string) };
-
-        public IIdGenerator<T> Build<T>()
-        {
-            return (IIdGenerator<T>)new StringIdGenerator();
-        }
-
-        public bool RequiresSequences { get; } = false;
-
-        public class StringIdGenerator : IIdGenerator<string>
-        {
-            public string Assign(ITenant tenant, string existing, out bool assigned)
-            {
-                assigned = true;
-                return string.IsNullOrWhiteSpace(existing)
-                    ? ToShortString(Guid.NewGuid())
-                    : existing;
-            }
-
-            public string ToShortString(Guid guid)
-            {
-                var base64Guid = Convert.ToBase64String(guid.ToByteArray());
-
-                // Replace URL unfriendly characters with better ones
-                base64Guid = base64Guid.Replace('+', '-').Replace('/', '_');
-
-                // Remove the trailing ==
-                return base64Guid.Substring(0, base64Guid.Length - 2);
-            }
-        }
-    }
-
-    public static class IdHelper
-    {
-        public static string GenerateId()
-        {
-            var base64Guid = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
-
-            // Replace URL unfriendly characters with better ones
-            base64Guid = base64Guid.Replace('+', '-').Replace('/', '_');
-
-            // Remove the trailing ==
-            return base64Guid.Substring(0, base64Guid.Length - 2);
-        }
-    }
-
-
-
-
-
-
-    public class BusService :
-        IHostedService
-    {
-        private readonly IBusControl _busControl;
-
-        public BusService(IBusControl busControl)
-        {
-            _busControl = busControl;
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            return _busControl.StartAsync(cancellationToken);
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return _busControl.StopAsync(cancellationToken);
-        }
     }
 }
