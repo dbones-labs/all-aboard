@@ -1,9 +1,9 @@
-namespace WebApplication1
+namespace WebApplication1.Infrastructure.Marten
 {
     using System;
     using System.Collections.Generic;
-    using Marten.Schema.Identity;
-    using Marten.Storage;
+    using global::Marten.Schema.Identity;
+    using global::Marten.Storage;
 
     public class StringIdGeneration : IIdGeneration
     {

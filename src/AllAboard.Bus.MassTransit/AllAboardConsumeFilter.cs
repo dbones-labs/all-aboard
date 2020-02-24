@@ -15,10 +15,12 @@
         public async Task Send(T context, IPipe<T> next)
         {
             var scope = context.GetPayload<IServiceProvider>();
+            var idStrategy = new IdStrategy();
 
             //filter if we have already processed the message
             var messageFilter = scope.GetService<MessageFilter>();
-            var hasProcessedMessage = await messageFilter.HasProcessedMessage(context.MessageId.ToString());
+            var id = idStrategy.ConvertFromProvider(context.MessageId);
+            var hasProcessedMessage = await messageFilter.HasProcessedMessage(id);
             if (hasProcessedMessage)
             {
                 return;
@@ -26,8 +28,8 @@
 
             //grab some information about the current context
             var message = scope.GetService<MessageEntry>();
-            message.CorrelationId = context.CorrelationId.ToString();
-            message.SourceId = context.MessageId.ToString();
+            message.CorrelationId = idStrategy.ConvertFromProvider(context.CorrelationId);
+            message.SourceId = idStrategy.ConvertFromProvider(context.MessageId);
 
 
             //process as normal

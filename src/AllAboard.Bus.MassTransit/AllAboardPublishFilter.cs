@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using global::MassTransit;
     using GreenPipes;
+    using Microsoft.Extensions.DependencyInjection;
 
     public class AllAboardPublishFilter<T> : IFilter<T> where T : class, PublishContext
     {

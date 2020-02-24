@@ -1,4 +1,4 @@
-namespace WebApplication1
+namespace WebApplication1.Consumers
 {
     using System.Threading.Tasks;
     using MassTransit;

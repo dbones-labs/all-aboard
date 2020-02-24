@@ -1,4 +1,4 @@
-namespace WebApplication1
+namespace WebApplication1.Infrastructure.Masstransit
 {
     using System.Threading;
     using System.Threading.Tasks;
