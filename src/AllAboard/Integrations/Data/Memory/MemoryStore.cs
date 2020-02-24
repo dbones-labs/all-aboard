@@ -1,4 +1,4 @@
-﻿namespace AllAboard.Integrations.Data
+﻿namespace AllAboard.Integrations.Data.Memory
 {
     using System.Collections.Generic;
     using Services;

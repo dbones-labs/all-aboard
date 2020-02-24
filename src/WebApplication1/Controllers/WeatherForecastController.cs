@@ -9,15 +9,6 @@ namespace WebApplication1.Controllers
     using Microsoft.Extensions.Logging;
 
 
-    public class ScheduledBusController
-    {
-        public ScheduledBusController()
-        {
-            
-        }
-    }
-
-
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase

@@ -1,5 +1,6 @@
-﻿namespace AllAboard.Services
+﻿namespace AllAboard.Services.Consuming
 {
+    using Integrations.Bus;
     using Integrations.Data;
 
     public class TransactionBus : IBus
@@ -23,32 +24,22 @@
             var initiatorMessage = _consumingContext.Message;
 
             var id = _idStrategy.ConvertFromProvider(_idStrategy.NewId());
+            var correlationId = initiatorMessage == null 
+                ? _idStrategy.ConvertFromProvider(_idStrategy.NewId()) 
+                : initiatorMessage.CorrelationId;
+
             var entry = new MessageEntry
             {
                 Body = message,
 
                 Id = id,
-                SourceId = initiatorMessage.Id,
-                CorrelationId = initiatorMessage.CorrelationId,
+                SourceId = initiatorMessage?.Id,
+                CorrelationId = correlationId,
                 TopicType = typeof(T)
             };
 
 
             _session.Add(entry);
         }
-    }
-
-    public interface IIdStrategy
-    {
-        object NewId();
-        object ConvertToProvider(string value);
-        string ConvertFromProvider(object value);
-    }
-
-    public class PublishingContext
-    {
-        public MessageEntry SourceMessage { get; set; }
-
-        public MessageEntry Message { get; set; }
     }
 }
