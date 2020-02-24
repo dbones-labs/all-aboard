@@ -5,6 +5,8 @@ namespace WebApplication1
     using AllAboard.Bus.MassTransit;
     using AllAboard.Configuration;
     using AllAboard.Data.Marten;
+    using Infrastructure.Marten;
+    using Infrastructure.Masstransit;
     using Marten;
     using MassTransit;
     using Microsoft.AspNetCore.Hosting;

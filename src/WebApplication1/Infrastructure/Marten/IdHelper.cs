@@ -1,4 +1,4 @@
-namespace WebApplication1
+namespace WebApplication1.Infrastructure.Marten
 {
     using System;
 

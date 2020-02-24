@@ -6,6 +6,9 @@ using Microsoft.Extensions.Hosting;
 
 namespace WebApplication1
 {
+    using Infrastructure.AllAboard;
+    using Infrastructure.Marten;
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
