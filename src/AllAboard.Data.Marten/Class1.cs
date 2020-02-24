@@ -3,9 +3,19 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Configuration;
     using global::Marten;
     using Integrations.Data;
+    using Microsoft.Extensions.DependencyInjection;
     using Services;
+
+    public class Marten : IDataStoreProvider {
+        public void RegisterServices(IServiceCollection services)
+        {
+            services.AddScoped<ISession, ISession>();
+        }
+    }
+
 
     public class Session : ISession
     {
@@ -41,6 +51,12 @@
                 .OrderByDescending(x => x.ProcessedAt)
                 .ToList();
             return Task.FromResult(items);
+        }
+
+        public Task<MessageEntry> GetPublishedMessage(string id)
+        {
+            var message = _session.Query<MessageEntry>().SingleOrDefault(x => x.Id == id);
+            return Task.FromResult(message);
         }
 
         public Task Commit()

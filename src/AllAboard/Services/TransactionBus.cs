@@ -1,37 +1,54 @@
 ﻿namespace AllAboard.Services
 {
-    using System;
-    using System.Collections.Generic;
-    using Integrations;
     using Integrations.Data;
 
     public class TransactionBus : IBus
     {
         private readonly ISession _session;
-        private readonly IEnumerable<IContextExtractor> _extractors;
-        private readonly ProcessingContext _context;
+        private readonly IIdStrategy _idStrategy;
+        private readonly ConsumingMessageContext _consumingContext;
 
-        public TransactionBus(ISession session, IEnumerable<IContextExtractor> extractors, ProcessingContext context)
+        public TransactionBus(
+            ISession session,
+            IIdStrategy idStrategy,
+            ConsumingMessageContext consumingContext)
         {
             _session = session;
-            _extractors = extractors;
-            _context = context;
+            _idStrategy = idStrategy;
+            _consumingContext = consumingContext;
         }
 
         public void Publish<T>(T message)
         {
+            var initiatorMessage = _consumingContext.Message;
+
+            var id = _idStrategy.ConvertFromProvider(_idStrategy.NewId());
             var entry = new MessageEntry
             {
-                Body = message, 
-                Id = Guid.NewGuid().ToString("D")
+                Body = message,
+
+                Id = id,
+                SourceId = initiatorMessage.Id,
+                CorrelationId = initiatorMessage.CorrelationId,
+                TopicType = typeof(T)
             };
 
-            foreach (var extractor in _extractors)
-            {
-                extractor.Populate(entry, _context);
-            }
 
             _session.Add(entry);
         }
+    }
+
+    public interface IIdStrategy
+    {
+        object NewId();
+        object ConvertToProvider(string value);
+        string ConvertFromProvider(object value);
+    }
+
+    public class PublishingContext
+    {
+        public MessageEntry SourceMessage { get; set; }
+
+        public MessageEntry Message { get; set; }
     }
 }
