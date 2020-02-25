@@ -5,7 +5,7 @@
     using global::MassTransit;
     using GreenPipes;
 
-    public class AllAboardPipeSpecification : IPipeSpecification<ConsumeContext>, IPipeSpecification<PublishContext>
+    public class ConsumePipeSpecification : IPipeSpecification<ConsumeContext>
     {
         public IEnumerable<ValidationResult> Validate()
         {
@@ -14,12 +14,7 @@
 
         public void Apply(IPipeBuilder<ConsumeContext> builder)
         {
-            builder.AddFilter(new AllAboardConsumeFilter<ConsumeContext>());
-        }
-
-        public void Apply(IPipeBuilder<PublishContext> builder)
-        { 
-            builder.AddFilter(new AllAboardPublishFilter<PublishContext>());
+            builder.AddFilter(new ConsumeFilter<ConsumeContext>());
         }
     }
 }
