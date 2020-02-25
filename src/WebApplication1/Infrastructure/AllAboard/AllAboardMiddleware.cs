@@ -2,6 +2,7 @@ namespace WebApplication1.Infrastructure.AllAboard
 {
     using System.Threading.Tasks;
     using global::AllAboard.Services.Background;
+    using global::AllAboard.Services.Consuming;
     using Microsoft.AspNetCore.Http;
 
     public class AllAboardMiddleware
@@ -14,7 +15,7 @@ namespace WebApplication1.Infrastructure.AllAboard
         }
 
         // IMyScopedService is injected into Invoke
-        public async Task Invoke(HttpContext httpContext, MessageQueuing queuing)
+        public async Task Invoke(HttpContext httpContext, MessageQueuing queuing, ConsumingMessageContext consumingMessageContext)
         {
             await _next(httpContext);
             await queuing.ProcessMessages();

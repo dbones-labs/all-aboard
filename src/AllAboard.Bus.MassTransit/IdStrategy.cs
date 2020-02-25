@@ -13,13 +13,14 @@
 
         public object ConvertToProvider(string value)
         {
+            if (value == null) return null;
             if (Guid.TryParse(value, out var result)) return result;
             throw new Exception($"sorry {value} is not a valid GUID for Masstransit");
         }
 
         public string ConvertFromProvider(object value)
         {
-            return ((Guid) value).ToString("D");
+            return ((Guid?) value)?.ToString("D");
         }
     }
 }

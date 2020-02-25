@@ -10,7 +10,7 @@
     using Services.Background;
     using Services.Consuming;
 
-    public class AllAboardConsumeFilter<T> : IFilter<T> where T : class, ConsumeContext
+    public class ConsumeFilter<T> : IFilter<T> where T : class, ConsumeContext
     {
         public async Task Send(T context, IPipe<T> next)
         {
@@ -27,9 +27,12 @@
             }
 
             //grab some information about the current context
-            var message = scope.GetService<MessageEntry>();
-            message.CorrelationId = idStrategy.ConvertFromProvider(context.CorrelationId);
-            message.SourceId = idStrategy.ConvertFromProvider(context.MessageId);
+            var ctx = scope.GetService<ConsumingMessageContext>();
+            ctx.Message = new MessageEntry()
+            {
+                CorrelationId = idStrategy.ConvertFromProvider(context.CorrelationId),
+                SourceId = idStrategy.ConvertFromProvider(context.MessageId)
+            };
 
 
             //process as normal

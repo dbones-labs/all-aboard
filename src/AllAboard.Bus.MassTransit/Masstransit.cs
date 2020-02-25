@@ -3,7 +3,6 @@
     using Configuration;
     using Integrations.Bus;
     using Microsoft.Extensions.DependencyInjection;
-    using Services;
 
 
     public class Masstransit : IMessagingProvider {

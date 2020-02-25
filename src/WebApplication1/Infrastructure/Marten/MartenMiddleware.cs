@@ -17,7 +17,7 @@ namespace WebApplication1.Infrastructure.Marten
         public async Task Invoke(HttpContext httpContext, IDocumentSession session)
         {
             await _next(httpContext);
-            await session.SaveChangesAsync();
+            //await session.SaveChangesAsync();
         }
     }
 }

@@ -52,12 +52,14 @@ namespace WebApplication1
 
                         config.AddBus(provider => Bus.Factory.CreateUsingInMemory(cfg =>
                         {
+                            cfg.UseServiceScope(provider);
+
                             cfg.ReceiveEndpoint("queue", e =>
                             {
                                 e.ConfigureConsumer(provider, consumerTypes.ToArray());
                             });
 
-                            cfg.UseServiceScope(provider);
+                            
 
                             //add to the pipeline
                             cfg.UseAllAboard();
