@@ -27,10 +27,20 @@
         public async Task Process(string messageId)
         {
             var message = await _session.GetPublishedMessage(messageId);
+
+            if (message == null)
+            {
+                _logger.LogInformation($"might have already processed message id: {messageId}");
+                return;
+            }
+
             _entry.Message = message;
+
             await _busAdapter.Publish(message);
+            _session.Remove(message);
+            
             await _session.Commit();
-            _logger.LogDebug($"published {message.Id}");
+            _logger.LogInformation($"published {message.TopicType.FullName} {message.Id}");
         }
     }
 }

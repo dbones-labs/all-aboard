@@ -1,8 +1,8 @@
-namespace WebApplication1.Infrastructure.Masstransit
+namespace WebApplication1.Infrastructure.MassTransit
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using MassTransit;
+    using global::MassTransit;
     using Microsoft.Extensions.Hosting;
 
     public class BusService :

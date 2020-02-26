@@ -7,7 +7,7 @@
     using Integrations.Bus;
     using Services;
 
-    public class ApplyHeadersPipe : IPipe<PublishContext<MessageEntry>>
+    public class ApplyHeadersPipe : IPipe<PublishContext>
     {
         private readonly MessageEntry _entry;
         private readonly IIdStrategy _idStrategy;
@@ -18,7 +18,7 @@
             _idStrategy = idStrategy;
         }
 
-        public Task Send(PublishContext<MessageEntry> context)
+        public Task Send(PublishContext context)
         {
             context.MessageId = (Guid?)_idStrategy.ConvertToProvider(_entry.Id);
             context.CorrelationId = (Guid?) _idStrategy.ConvertToProvider(_entry.CorrelationId);
@@ -29,8 +29,6 @@
             {
                 context.Headers.Set(header.Key, header.Value);
             }
-
-            
 
             return Task.CompletedTask;
         }

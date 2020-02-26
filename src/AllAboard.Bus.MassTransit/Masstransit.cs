@@ -4,8 +4,7 @@
     using Integrations.Bus;
     using Microsoft.Extensions.DependencyInjection;
 
-
-    public class Masstransit : IMessagingProvider {
+    public class MassTransit : IMessagingProvider {
         public void RegisterServices(IServiceCollection services)
         {
             services.AddScoped<IBusAdapter, BusAdapter>();

@@ -1,12 +1,14 @@
 namespace WebApplication1
 {
+    using System;
     using System.Linq;
     using System.Reflection;
     using AllAboard.Bus.MassTransit;
     using AllAboard.Configuration;
     using AllAboard.Data.Marten;
+    using GreenPipes;
     using Infrastructure.Marten;
-    using Infrastructure.Masstransit;
+    using Infrastructure.MassTransit;
     using Marten;
     using MassTransit;
     using Microsoft.AspNetCore.Hosting;
@@ -27,7 +29,7 @@ namespace WebApplication1
                 .ConfigureAllAboard(setup =>
                 {
                     setup.UseDataStore<Marten>();
-                    setup.UseMessaging<Masstransit>();
+                    setup.UseMessaging<MassTransit>();
                 })
 
                 .ConfigureServices(services =>
@@ -50,18 +52,23 @@ namespace WebApplication1
                             config.AddConsumer(consumerType);
                         }
 
-                        config.AddBus(provider => Bus.Factory.CreateUsingInMemory(cfg =>
-                        {
-                            cfg.UseServiceScope(provider);
 
-                            cfg.ReceiveEndpoint("queue", e =>
+                        config.AddBus(provider => Bus.Factory.CreateUsingRabbitMq(cfg =>
+                        {
+
+                            cfg.Host(new Uri($"rabbitmq://localhost"), h =>
                             {
+                                h.Username("guest");
+                                h.Password("guest");
+                            });
+
+                            cfg.ReceiveEndpoint("test-app", e =>
+                            {
+                                e.UseMessageRetry(x => x.Interval(10, new TimeSpan(0, 0, 0, 0, 500)));
                                 e.ConfigureConsumer(provider, consumerTypes.ToArray());
                             });
 
-                            
-
-                            //add to the pipeline
+                            cfg.UseServiceScope(provider);
                             cfg.UseAllAboard();
                         }));
 
