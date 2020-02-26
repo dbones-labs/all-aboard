@@ -1,6 +1,5 @@
 ﻿namespace AllAboard.Configuration
 {
-    using System.Collections.Generic;
     using Microsoft.Extensions.DependencyInjection;
     using Services;
     using Services.Background;

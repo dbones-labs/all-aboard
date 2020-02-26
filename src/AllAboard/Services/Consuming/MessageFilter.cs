@@ -54,13 +54,18 @@
 
         /// <summary>
         /// we need to mark the message as processed
+        /// note if the message has been processed during this threads exexution then we will throw an exception
+        /// in order to cancel its database transaction. this will then cause the message to be re-processed
+        /// and then it will be picked up by the <see cref="HasProcessedMessage"/> method and skipped.
         /// </summary>
         public virtual async Task MarkMessageAsProcessed()
         {
+            //try to confirm if the message has been processed by another thread.
             var alreadyProcessed = await _session.HasProcessedMessage(_processedMessage.Id);
             if (alreadyProcessed) throw new Exception($"Message has been processed {_messageInfo}");
 
             //we have delayed the add to this point "post-processing", to allow us to run the query above
+            //Note, we also hope that the commit will fail if the message has been process by another thread
             _session.Add(_processedMessage);
         }
     }
