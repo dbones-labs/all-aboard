@@ -9,6 +9,6 @@
     /// </summary>
     public interface IBusAdapter
     {
-        Task Publish(MessageEntry message, CancellationToken token = default(CancellationToken));
+        Task Publish(MessageEntry message, CancellationToken token = default);
     }
 }
