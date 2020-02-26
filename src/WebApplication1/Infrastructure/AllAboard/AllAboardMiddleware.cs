@@ -14,7 +14,7 @@ namespace WebApplication1.Infrastructure.AllAboard
             _next = next;
         }
 
-        // IMyScopedService is injected into Invoke
+
         public async Task Invoke(HttpContext httpContext, MessageQueuing queuing, ConsumingMessageContext consumingMessageContext)
         {
             await _next(httpContext);

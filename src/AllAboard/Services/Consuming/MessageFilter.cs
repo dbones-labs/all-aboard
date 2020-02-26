@@ -36,7 +36,7 @@
             var alreadyProcessed = await _session.HasProcessedMessage(messageId);
             if (alreadyProcessed)
             {
-                _logger.LogInformation($"Already processed {_messageInfo}");
+                _logger.LogInformation($"Already processed message, Id: {_messageInfo}");
                 return true;
             }
 

@@ -10,8 +10,7 @@
     {
         private readonly IPublishEndpoint _bus;
         private readonly IIdStrategy _idStrategy;
-
-
+        
         public BusAdapter(IPublishEndpoint bus, IIdStrategy idStrategy)
         {
             _bus = bus;
@@ -20,7 +19,8 @@
 
         public async Task Publish(MessageEntry message, CancellationToken token = default)
         {
-            await _bus.Publish(message, new ApplyHeadersPipe(message, _idStrategy), token);
+            await _bus.Publish(message.Body, message.TopicType, new ApplyHeadersPipe(message, _idStrategy), token);
         }
     }
+
 }

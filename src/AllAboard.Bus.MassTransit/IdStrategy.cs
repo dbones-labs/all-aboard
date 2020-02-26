@@ -15,7 +15,7 @@
         {
             if (value == null) return null;
             if (Guid.TryParse(value, out var result)) return result;
-            throw new Exception($"sorry {value} is not a valid GUID for Masstransit");
+            throw new Exception($"sorry {value} is not a valid GUID for MassTransit");
         }
 
         public string ConvertFromProvider(object value)

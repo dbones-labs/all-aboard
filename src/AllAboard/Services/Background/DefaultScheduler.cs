@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Integrations.Data;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
 
@@ -15,7 +16,6 @@
         private readonly ManualResetEventSlim _manualEvent = new ManualResetEventSlim();
         private volatile bool _isRunning = true;
         private readonly object _lock = new object();
-        private readonly Queue<MessageEntry> _toProcess = new Queue<MessageEntry>();
         private Task _backgroundWorker;
 
         public DefaultScheduler(IServiceProvider scope, ILogger<DefaultScheduler> logger)
@@ -24,26 +24,27 @@
             _logger = logger;
         }
 
-        public void Enqueue(IEnumerable<MessageEntry> messageEntries)
+        public void Trigger()
         {
-            lock (_lock)
-            {
-                foreach (var messageEntry in messageEntries)
-                {
-                    _logger.LogDebug($"enqueuing {messageEntry.Id} for publishing");
-                    _toProcess.Enqueue(messageEntry);
-                }
-            }
             _manualEvent.Set();
         }
 
-        public void Start(CancellationToken cancellationToken = default(CancellationToken))
+        private async Task<IEnumerable<MessageEntry>> GetMessagesToProcess()
+        {
+            using (var scope = _scope.CreateScope())
+            {
+                var session = scope.ServiceProvider.GetService<ISession>();
+                return await session.GetPublishedMessages();
+            }
+        }
+
+        public void Start(CancellationToken cancellationToken = default)
         {
             _backgroundWorker = new Task(() => BackgroundWorker(cancellationToken));
             _backgroundWorker.Start();
         }
 
-        public void BackgroundWorker(CancellationToken cancellationToken = default(CancellationToken))
+        public void BackgroundWorker(CancellationToken cancellationToken = default)
         {
             bool IsRunning() => _isRunning && !cancellationToken.IsCancellationRequested;
 
@@ -53,47 +54,49 @@
                 if (!IsRunning()) return;
                 _manualEvent.Reset();
 
-                var tasks = new List<Task>();
-                var messages = new List<MessageEntry>();
-
                 _logger.LogDebug("get enqueued messages");
-                lock (_lock)
-                {
-                    while (_toProcess.Any())
-                    {
-                        var entry = _toProcess.Dequeue();
-                        messages.Add(entry);
-                    }
-                }
+                var tasks = new List<Task>();
+                var messages = GetMessagesToProcess().Result.ToList();
 
                 _logger.LogInformation($"publishing {messages.Count} messages");
-                foreach (var messageEntry in messages)
+                foreach (var messageId in messages.Select(x=> x.Id).Distinct())
                 {
-                    var t = ProcessMessageEntry(messageEntry);
+                    var t = ProcessMessageEntry(messageId);
                     //t.Start();
                     tasks.Add(t);
                 }
 
                 Task.WaitAll(tasks.ToArray());
+                _logger.LogInformation($"published {messages.Count} messages");
             }
         }
 
-        private async Task ProcessMessageEntry(MessageEntry messageEntry)
+        private async Task ProcessMessageEntry(string messageId)
         {
-            //note each message is processed individually incase of failure
+            //note each message is processed individually in-case of failure
             //we do not want to loose progress, and minimise duplicates being published
             using (var childScope = _scope.CreateScope())
             {
-                var processor = childScope.ServiceProvider.GetService<MessageProcessor>();
-                await processor.Process(messageEntry.Id);
+                try
+                {
+                    var processor = childScope.ServiceProvider.GetService<MessageProcessor>();
+                    await processor.Process(messageId);
+                }
+                catch (Exception e)
+                {
+                    //we do not want to crash the main thread, so we will log out, and try again.
+                    _logger.LogError(e, "failed to process message");
+                }
+
             }
+
         }
 
         public void Dispose()
         {
             _isRunning = false;
             _manualEvent?.Dispose();
-            _backgroundWorker?.Dispose();
+            Task.WaitAll(_backgroundWorker);
         }
     }
 }
