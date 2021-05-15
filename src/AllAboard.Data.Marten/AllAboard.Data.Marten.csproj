@@ -2,10 +2,30 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>AllAboard.Marten</RootNamespace>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>0.0.1</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>AllAboard.Marten</PackageId>
+    <PackageTitle>AllAboard.Marten</PackageTitle>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageTags>messageing message-filter marten data</PackageTags>
+    <PackageLicenseUrl>http://opensource.org/licenses/Apache-2.0</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/dbones-labs/all-aboard</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dbones-labs/all-aboard</RepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <IncludeSource>false</IncludeSource>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Marten" Version="3.10.0" />
+    <PackageReference Include="Marten" Version="3.13.4" />
   </ItemGroup>
 
   <ItemGroup>
