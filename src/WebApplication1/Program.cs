@@ -65,7 +65,10 @@ namespace WebApplication1
                             cfg.ReceiveEndpoint("test-app", e =>
                             {
                                 e.UseMessageRetry(x => x.Interval(10, new TimeSpan(0, 0, 0, 0, 500)));
-                                e.ConfigureConsumer(provider, consumerTypes.ToArray());
+                                foreach (var consumerType in consumerTypes)
+                                {
+                                    e.ConfigureConsumer(provider, consumerType);
+                                }
                             });
 
                             cfg.UseServiceScope(provider);
